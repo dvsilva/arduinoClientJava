@@ -1,6 +1,6 @@
 package control;
 
-import model.LedOperationsEnum;
+import model.OperationsEnum;
 
 /**
  * @author Danyllo
@@ -26,18 +26,18 @@ public class Arduino {
 	 * @param button
 	 *            - Botao que e clicado na interface Java
 	 */
-	public String comunicacaoArduino(LedOperationsEnum operacao) {
+	public String executa(OperationsEnum operacao) {
 		
 		// PARA LIGAR ENVIA 1
 		// PARA DESLIGAR ENVIA 2
 		
-		if (operacao == LedOperationsEnum.LIGAR) {
+		if (operacao == OperationsEnum.LIGAR) {
 			arduino.enviaDados(1);
-			return "Led Ligado";
+			return "Ligado";
 		} 
-		else if (operacao == LedOperationsEnum.DESLIGAR) {
+		else if (operacao == OperationsEnum.DESLIGAR) {
 			arduino.enviaDados(2);
-			return "Led Desligado";
+			return "Desligado";
 		} 
 		else {
 			return "Nenhuma acao. Operacao Invalida";
