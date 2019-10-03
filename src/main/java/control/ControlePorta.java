@@ -1,20 +1,34 @@
 package control;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
+import javax.swing.JOptionPane;
+
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.SerialPort;
-import java.io.IOException;
-import java.io.OutputStream;
-import javax.swing.JOptionPane;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 
 /**
  * @author Danyllo
  */
-public class ControlePorta {
+public class ControlePorta implements SerialPortEventListener {
+
+	private InputStream serialInp;
+	private BufferedReader input;
 	
 	private OutputStream serialOut;
+	
 	private int taxa;
 	private String portaCOM;
+	
+	private String lastInputValue;
+	private SerialPort port;
 
 	/**
 	 * Construtor da classe ControlePorta
@@ -49,12 +63,21 @@ public class ControlePorta {
 			}
 			
 			// Abre a porta COM
-			SerialPort port = (SerialPort) portId.open("Comunicacao serial", this.taxa);
+			port = (SerialPort) portId.open("Comunicacao serial", this.taxa);
+			
+			serialInp = port.getInputStream();
+			input = new BufferedReader(new InputStreamReader(serialInp));
+			
 			serialOut = port.getOutputStream();
+			
 			port.setSerialPortParams(this.taxa, // taxa de transferencia da porta serial
 					SerialPort.DATABITS_8, // taxa de 10 bits 8 (envio)
 					SerialPort.STOPBITS_1, // taxa de 10 bits 1 (recebimento)
 					SerialPort.PARITY_NONE); // receber e enviar dados
+			
+			// add event listeners
+			port.addEventListener(this);
+			port.notifyOnDataAvailable(true);
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -62,11 +85,30 @@ public class ControlePorta {
 	}
 
 	/**
+	 * Handle an event on the serial port. Read the data and print it.
+	 */
+	public synchronized void serialEvent(SerialPortEvent oEvent) {
+		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+			try {
+				this.lastInputValue= input.readLine();
+				//System.out.println(lastInputValue);
+			} catch (Exception e) {
+				System.err.println(e.toString());
+			}
+		}
+		// Ignore all the other eventTypes, but you should consider the other ones.
+	}
+	
+	/**
 	 * Metodo que fecha a comunicacao com a porta serial
 	 */
 	public void close() {
 		try {
+			serialInp.close();
 			serialOut.close();
+			
+			port.removeEventListener();
+			port.close();
 		} 
 		catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Nao foi possivel fechar porta COM.", "Fechar porta COM", JOptionPane.PLAIN_MESSAGE);
@@ -85,4 +127,13 @@ public class ControlePorta {
 			JOptionPane.showMessageDialog(null, "Nao foi possivel enviar o dado. ", "Enviar dados", JOptionPane.PLAIN_MESSAGE);
 		}
 	}
+	
+	public String getLastInputValue() {
+		return lastInputValue;
+	}
+
+	public void setLastInputValue(String lastInputValue) {
+		this.lastInputValue = lastInputValue;
+	}
+
 }

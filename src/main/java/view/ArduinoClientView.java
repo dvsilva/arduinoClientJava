@@ -49,15 +49,17 @@ public class ArduinoClientView extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent source) {
+		Arduino conn = Arduino.getSingleton();
+		String result = conn.obtemDados();
+		System.out.println(result);
+		
 		if(source.getSource() == this.btLigar){
-			Arduino conn = Arduino.getSingleton();
-			String result = conn.executa(OperationsEnum.LIGAR);
+			result = conn.executa(OperationsEnum.LIGAR);
 			JOptionPane.showMessageDialog(this, result);
 		}
 		
 		if(source.getSource() == this.btDesligar){
-			Arduino conn = Arduino.getSingleton();
-			String result = conn.executa(OperationsEnum.DESLIGAR);
+			result = conn.executa(OperationsEnum.DESLIGAR);
 			JOptionPane.showMessageDialog(this, result);
 		}
 		

@@ -7,14 +7,14 @@ import model.OperationsEnum;
  */
 public class Arduino {
 	
-	private ControlePorta arduino;
+	private ControlePorta controlador;
 	private static Arduino singleton = null;
 
 	/**
 	 * Construtor da classe Arduino
 	 */
 	public Arduino() {
-		arduino = new ControlePorta("COM4", 9600);
+		controlador = new ControlePorta("COM4", 9600);
 		// Windows - porta e taxa de transmissao
 		// arduino = new ControlePorta("/dev/ttyUSB0",9600);
 		//Linux - porta e taxa de transmissao
@@ -32,16 +32,20 @@ public class Arduino {
 		// PARA DESLIGAR ENVIA 2
 		
 		if (operacao == OperationsEnum.LIGAR) {
-			arduino.enviaDados(1);
+			controlador.enviaDados(1);
 			return "Ligado";
 		} 
 		else if (operacao == OperationsEnum.DESLIGAR) {
-			arduino.enviaDados(2);
+			controlador.enviaDados(2);
 			return "Desligado";
 		} 
 		else {
 			return "Nenhuma acao. Operacao Invalida";
 		}
+	}
+
+	public String obtemDados() {
+		return controlador.getLastInputValue();
 	}
 
 	public static Arduino getSingleton() {
@@ -50,4 +54,5 @@ public class Arduino {
 		
 		return singleton;
 	}
+
 }
